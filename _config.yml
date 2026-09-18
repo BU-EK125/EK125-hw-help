@@ -1,0 +1,14 @@
+title: "EK125 Homework Help Sessions"
+author: "Stormy Attaway, Brian DePasquale, Christine Mulvey, Kenn Sebesta"
+execute:
+  execute_notebooks: force
+launch_buttons:
+  colab_url: "https://colab.research.google.com"
+repository:
+  url: "https://github.com/BU-EK125/EK125-hw-help"
+  branch: main
+
+# README.md and CONTRIBUTING.md are repo/instructor documentation, not
+# student-facing content, so they're excluded from the public site too.
+# archive/ holds superseded originals, kept for reference, not built.
+exclude_patterns: ["archive/*", "archive/**/*", "README.md", "CONTRIBUTING.md"]

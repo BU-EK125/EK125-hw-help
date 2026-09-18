@@ -1,0 +1,27 @@
+name: pr-check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Jupyter Book and tools
+        run: pip install --force-reinstall --no-cache-dir jupyter-book==1.0.2
+
+      - name: Build the Jupyter Book
+        # execute_notebooks: force in _config.yml means every notebook is
+        # executed fresh right here, so this alone catches broken code --
+        # no separate execute step needed.
+        run: jb build .
