@@ -8,6 +8,8 @@ on:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v3
@@ -18,10 +20,18 @@ jobs:
           python-version: '3.10'
 
       - name: Install Jupyter Book and tools
-        run: pip install --force-reinstall --no-cache-dir jupyter-book==1.0.2 ghp-import
+        run: pip install --force-reinstall --no-cache-dir jupyter-book==1.0.2
 
       - name: Build the Jupyter Book
         run: jb build .
 
       - name: Deploy to GitHub Pages
-        run: ghp-import -n -p -f _build/html
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./_build/html
+          # keep_files preserves anything already on gh-pages that this
+          # deploy doesn't touch -- specifically pr-preview/pr-N/
+          # directories from pr-check.yml's preview deploys, which a
+          # plain full-branch-replace (ghp-import -f) would wipe out.
+          keep_files: true

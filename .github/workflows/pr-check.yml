@@ -2,26 +2,47 @@ name: pr-check
 
 on:
   pull_request:
+    types: [opened, reopened, synchronize, closed]
     branches:
       - main
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v3
 
       - name: Set up Python
+        if: github.event.action != 'closed'
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
       - name: Install Jupyter Book and tools
+        if: github.event.action != 'closed'
         run: pip install --force-reinstall --no-cache-dir jupyter-book==1.0.2
 
       - name: Build the Jupyter Book
         # execute_notebooks: force in _config.yml means every notebook is
         # executed fresh right here, so this alone catches broken code --
         # no separate execute step needed.
+        if: github.event.action != 'closed'
         run: jb build .
+
+      - name: Deploy PR preview
+        # Publishes to gh-pages under pr-preview/pr-<N>/ and comments
+        # the live preview link on the PR. On a 'closed' event (merged
+        # or abandoned), this same action removes that preview
+        # directory instead -- no separate cleanup step needed, and the
+        # steps above are skipped since there's nothing to rebuild.
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./_build/html
